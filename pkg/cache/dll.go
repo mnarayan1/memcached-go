@@ -1,7 +1,6 @@
 package dll
 
 import {
-	"fmg"
 	"sync"
 }
 
@@ -39,15 +38,16 @@ func (dll *DLL) AddToHead(node *Node) {
 	dll.head.next = node
 }
 
-func (dll *DLL) RemoveFromTail(node *Node) {
+func (dll *DLL) RemoveFromTail(node *Node) *Node {
 	dll.mutex.Lock()
 	defer dll.mutex.Unlock()
 
 	if dll.tail.prev != dll.head {
-		val := dll.tail.prev
-		dll.DeleteNode(dll.tail.prev)
-
+		toRemove := dll.tail.prev
+		dll.DeleteNode(toRemove)
+		return toRemove
 	}
+	return nil
 }
 
 func (dll *DLL) DeleteNode(node* Node) {

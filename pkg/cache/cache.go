@@ -1,40 +1,36 @@
 package cache
 
-import {
-	"dll"
-}
+import "dll"
 
-type LRUCache {
+type LRUCache struct {
 	capacity int
-	dict map[int][*Node]
-	dll *DLL
+	dict map[string]*dll.Node
+	dll *dll.DLL
 }
 
-func (lru *LRUCache) Put(key int, value int) {
+func (lru *LRUCache) Put(key string, value string) {
 	node, contains := lru.dict[key]
 	if contains {
 		lru.dll.DeleteNode(node)
+		node.value = value
 		lru.dll.AddToHead(node)
-		lru.dict[key].value = value
 	} else {
-		if len(lru.dict) == capacity {
-			lru.dll.RemoveFromTail()
-			delete(lru.dict, key)
-		} else {
-			newNode := &Node{key: key, value: value}
-			lru.dll.AddToHead(newNode)
-			lru.dict[key] = newNode
+		if len(lru.dict) == lru.capacity {
+			toRemove := lru.dll.RemoveFromTail()
+			delete(lru.dict, toRemove.key)
 		}
+		newNode := &dll.Node{key: key, value: value}
+		lru.dll.AddToHead(newNode)
+		lru.dict[key] = newNode
 	}
 }
 
-func (lru *LRUCache) Get(key int) int {
+func (lru *LRUCache) Get(key string) string {
 	node, contains := lru.dict[key]
 	if contains {
 		lru.dll.DeleteNode(node)
 		lru.dll.AddToHead(node)
 		return node.value
-	} else {
-		return -1
 	}
+	return "Not found"
 }
