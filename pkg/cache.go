@@ -1,18 +1,25 @@
-package cache
+package gocache
 
 import {
 	"dll",
 	"sync"
 }
 
-type LRUCache struct {
+// cache with lru eviction
+
+type Cache struct {
 	capacity int
 	dict map[string]*dll.Node
 	dll *dll.DLL
 	mutex sync.Mutex
 }
 
-func (lru *LRUCache) Put(key string, value string) {
+func () NewCache(capacity int) *Cache{
+	newDLL := dll.DLLInit()
+	newCache := &Cache{capacity: capacity, dll: newDLL}
+}
+
+func (lru *Cache) Set(key string, value string) {
 	lru.mutex.Lock()
 	defer lru.mutex.Unlock()
 	
@@ -23,7 +30,8 @@ func (lru *LRUCache) Put(key string, value string) {
 		lru.dll.AddToHead(node)
 	} else {
 		if len(lru.dict) == lru.capacity {
-			toRemove := lru.dll.RemoveFromTail()
+			toRemove := lru.dll.tail
+			lru.dll.RemoveFromTail()
 			delete(lru.dict, toRemove.key)
 		}
 		newNode := &dll.Node{key: key, value: value}
@@ -32,10 +40,10 @@ func (lru *LRUCache) Put(key string, value string) {
 	}
 }
 
-func (lru *LRUCache) Get(key string) string {
+func (lru *Cache) Get(key string) string {
 	lru.mutex.Lock()
 	defer lru.mutex.Unlock()
-	
+
 	node, contains := lru.dict[key]
 	if contains {
 		lru.dll.DeleteNode(node)
@@ -43,4 +51,12 @@ func (lru *LRUCache) Get(key string) string {
 		return node.value
 	}
 	return "Not found"
+}
+
+func (lru *Cache) Delete(key string) {
+	node, contains := lru.dict[key]
+	if contains {
+		lru.dll.RemoveFromTail()
+		delete(lru.dict, node.key)
+	}
 }

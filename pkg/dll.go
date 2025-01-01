@@ -7,6 +7,7 @@ type Node struct {
 	value string
 	prev *Node
 	next *Node
+	expiration int
 }
 
 // dll with sentinel head/tail
