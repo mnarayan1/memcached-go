@@ -1,8 +1,6 @@
 package dll
 
-import {
-	"sync"
-}
+import "sync"
 
 type Node struct {
 	key string

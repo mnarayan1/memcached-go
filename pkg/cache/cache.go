@@ -1,14 +1,21 @@
 package cache
 
-import "dll"
+import {
+	"dll",
+	"sync"
+}
 
 type LRUCache struct {
 	capacity int
 	dict map[string]*dll.Node
 	dll *dll.DLL
+	mutex sync.Mutex
 }
 
 func (lru *LRUCache) Put(key string, value string) {
+	lru.mutex.Lock()
+	defer lru.mutex.Unlock()
+	
 	node, contains := lru.dict[key]
 	if contains {
 		lru.dll.DeleteNode(node)
@@ -26,6 +33,9 @@ func (lru *LRUCache) Put(key string, value string) {
 }
 
 func (lru *LRUCache) Get(key string) string {
+	lru.mutex.Lock()
+	defer lru.mutex.Unlock()
+	
 	node, contains := lru.dict[key]
 	if contains {
 		lru.dll.DeleteNode(node)
