@@ -1,17 +1,19 @@
 package dll
 
-import "sync"
+import (
+	"sync"
+	"time"
+)
 
 type Node struct {
-	key string
-	value string
-	prev *Node
-	next *Node
-	expiration int
+	key        string
+	value      string
+	prev       *Node
+	next       *Node
+	expiration time.Time
 }
 
 // dll with sentinel head/tail
-
 type DLL struct {
 	head *Node
 	tail *Node
@@ -37,7 +39,7 @@ func (dll *DLL) AddToHead(node *Node) {
 	dll.head.next = node
 }
 
-func (dll *DLL) RemoveFromTail(node *Node) *Node {
+func (dll *DLL) RemoveFromTail() *Node {
 	dll.mutex.Lock()
 	defer dll.mutex.Unlock()
 
@@ -49,7 +51,7 @@ func (dll *DLL) RemoveFromTail(node *Node) *Node {
 	return nil
 }
 
-func (dll *DLL) DeleteNode(node* Node) {
+func (dll *DLL) DeleteNode(node *Node) {
 	dll.mutex.Lock()
 	defer dll.mutex.Unlock()
 
